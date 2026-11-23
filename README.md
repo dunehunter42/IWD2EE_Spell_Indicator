@@ -1,0 +1,1 @@
+# IWD2EE_Spell_Indicator
