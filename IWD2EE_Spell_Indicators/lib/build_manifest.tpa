@@ -1,0 +1,143 @@
+// Spell resources are read only; BUT_ONLY prevents copying unchanged SPLs.
+COPY ~IWD2EE_Spell_Indicators/lua/data.lua~ ~override/I2SI_Data.lua~
+COPY_EXISTING_REGEXP GLOB ~^.*\.spl$~ ~override~
+  PATCH_IF SOURCE_SIZE >= 0x72 BEGIN
+    READ_SHORT 0x1c spell_type
+    PATCH_IF spell_type = 1 OR spell_type = 2 OR spell_type = 4 BEGIN
+      READ_LONG 0x18 spell_flags
+      READ_LONG 0x64 abilities
+      READ_SHORT 0x68 ability_count
+      SPRINT entries ~~
+      SPRINT wide ~false~
+      PATCH_IF (spell_type = 1 OR spell_type = 2) AND (spell_flags BAND 0x40000) = 0 BEGIN
+        SPRINT wide ~true~
+      END
+      PATCH_IF abilities >= 0x72 AND abilities + ability_count * 0x28 <= SOURCE_SIZE BEGIN
+        FOR (i=0; i<ability_count; ++i) BEGIN
+          READ_BYTE (abilities+i*0x28+0x0c) target
+          READ_SHORT (abilities+i*0x28+0x26) projectile
+          PATCH_IF target = 2 OR target = 4 BEGIN
+            SPRINT geometry ~~
+            PATCH_MATCH projectile WITH
+              22 BEGIN SPRINT geometry ~p=22,t=7,kind="cone",width=200,length=80,padding=25~ END
+              25 BEGIN SPRINT geometry ~p=25,t=7,kind="cone",width=200,length=350,padding=25~ END
+              38 BEGIN SPRINT geometry ~p=38,t=6,kind="circle",radius=200~ END
+              40 BEGIN SPRINT geometry ~p=40,t=5,kind="line",length=400~ END
+              64 BEGIN SPRINT geometry ~p=64,t=6,kind="circle",radius=150~ END
+              67 BEGIN SPRINT geometry ~p=67,t=6,kind="circle",radius=140~ END
+              92 BEGIN SPRINT geometry ~p=92,t=6,kind="circle",radius=200~ END
+              94 BEGIN SPRINT geometry ~p=94,t=8,kind="circle",radius=256~ END
+              95 BEGIN SPRINT geometry ~p=95,t=6,kind="circle",radius=100~ END
+              96 BEGIN SPRINT geometry ~p=96,t=8,kind="trap",radius=100,trigger=50~ END
+              97 BEGIN SPRINT geometry ~p=97,t=7,kind="cone",width=200,length=200,padding=25~ END
+              98 BEGIN SPRINT geometry ~p=98,t=6,kind="circle",radius=200~ END
+              100 BEGIN SPRINT geometry ~p=100,t=8,kind="trap",radius=80,trigger=50~ END
+              101 BEGIN SPRINT geometry ~p=101,t=6,kind="circle",radius=100~ END
+              187 BEGIN SPRINT geometry ~p=187,t=6,kind="circle",radius=150~ END
+              190 BEGIN SPRINT geometry ~p=190,t=6,kind="circle",radius=150~ END
+              204 BEGIN SPRINT geometry ~p=204,t=6,kind="circle",radius=256~ END
+              211 BEGIN SPRINT geometry ~p=211,t=6,kind="circle",radius=200~ END
+              212 BEGIN SPRINT geometry ~p=212,t=6,kind="circle",radius=150~ END
+              213 BEGIN SPRINT geometry ~p=213,t=6,kind="circle",radius=150~ END
+              214 BEGIN SPRINT geometry ~p=214,t=6,kind="circle",radius=100~ END
+              215 BEGIN SPRINT geometry ~p=215,t=6,kind="circle",radius=60~ END
+              216 BEGIN SPRINT geometry ~p=216,t=6,kind="circle",radius=250~ END
+              217 BEGIN SPRINT geometry ~p=217,t=6,kind="circle",radius=250~ END
+              235 BEGIN SPRINT geometry ~p=235,t=6,kind="circle",radius=200~ END
+              236 BEGIN SPRINT geometry ~p=236,t=6,kind="circle",radius=250~ END
+              237 BEGIN SPRINT geometry ~p=237,t=6,kind="circle",radius=250~ END
+              238 BEGIN SPRINT geometry ~p=238,t=6,kind="circle",radius=300~ END
+              241 BEGIN SPRINT geometry ~p=241,t=6,kind="circle",radius=150~ END
+              242 BEGIN SPRINT geometry ~p=242,t=6,kind="circle",radius=300~ END
+              245 BEGIN SPRINT geometry ~p=245,t=6,kind="circle",radius=150~ END
+              246 BEGIN SPRINT geometry ~p=246,t=6,kind="circle",radius=150~ END
+              248 BEGIN SPRINT geometry ~p=248,t=6,kind="circle",radius=200~ END
+              249 BEGIN SPRINT geometry ~p=249,t=6,kind="circle",radius=200~ END
+              252 BEGIN SPRINT geometry ~p=252,t=6,kind="circle",radius=250~ END
+              254 BEGIN SPRINT geometry ~p=254,t=6,kind="circle",radius=300~ END
+              255 BEGIN SPRINT geometry ~p=255,t=6,kind="circle",radius=150~ END
+              256 BEGIN SPRINT geometry ~p=256,t=6,kind="circle",radius=300~ END
+              264 BEGIN SPRINT geometry ~p=264,t=6,kind="circle",radius=200~ END
+              266 BEGIN SPRINT geometry ~p=266,t=6,kind="circle",radius=350~ END
+              272 BEGIN SPRINT geometry ~p=272,t=7,kind="cone",width=175,length=400,padding=25~ END
+              273 BEGIN SPRINT geometry ~p=273,t=6,kind="circle",radius=300~ END
+              274 BEGIN SPRINT geometry ~p=274,t=6,kind="circle",radius=150~ END
+              275 BEGIN SPRINT geometry ~p=275,t=6,kind="circle",radius=200~ END
+              276 BEGIN SPRINT geometry ~p=276,t=6,kind="circle",radius=300~ END
+              277 BEGIN SPRINT geometry ~p=277,t=6,kind="circle",radius=300~ END
+              278 BEGIN SPRINT geometry ~p=278,t=6,kind="circle",radius=150~ END
+              279 BEGIN SPRINT geometry ~p=279,t=6,kind="circle",radius=250~ END
+              282 BEGIN SPRINT geometry ~p=282,t=6,kind="circle",radius=100~ END
+              283 BEGIN SPRINT geometry ~p=283,t=6,kind="circle",radius=250~ END
+              284 BEGIN SPRINT geometry ~p=284,t=6,kind="circle",radius=150~ END
+              286 BEGIN SPRINT geometry ~p=286,t=6,kind="circle",radius=150~ END
+              287 BEGIN SPRINT geometry ~p=287,t=6,kind="circle",radius=150~ END
+              288 BEGIN SPRINT geometry ~p=288,t=6,kind="circle",radius=300~ END
+              295 BEGIN SPRINT geometry ~p=295,t=6,kind="circle",radius=250~ END
+              296 BEGIN SPRINT geometry ~p=296,t=7,kind="cone",width=200,length=120,padding=25~ END
+              299 BEGIN SPRINT geometry ~p=299,t=6,kind="circle",radius=120~ END
+              300 BEGIN SPRINT geometry ~p=300,t=6,kind="circle",radius=150~ END
+              301 BEGIN SPRINT geometry ~p=301,t=6,kind="circle",radius=300~ END
+              302 BEGIN SPRINT geometry ~p=302,t=4,kind="line",length=400~ END
+              304 BEGIN SPRINT geometry ~p=304,t=11,kind="wall",wallMode="native"~ END
+              306 BEGIN SPRINT geometry ~p=306,t=6,kind="circle",radius=350~ END
+              307 BEGIN SPRINT geometry ~p=307,t=6,kind="circle",radius=120~ END
+              309 BEGIN SPRINT geometry ~p=309,t=6,kind="circle",radius=200~ END
+              312 BEGIN SPRINT geometry ~p=312,t=12,kind="cross",length=300~ END
+              313 BEGIN SPRINT geometry ~p=313,t=4,kind="line",length=600~ END
+              315 BEGIN SPRINT geometry ~p=315,t=7,kind="cone",width=100,length=300,padding=25~ END
+              317 BEGIN SPRINT geometry ~p=317,t=6,kind="circle",radius=120~ END
+              318 BEGIN SPRINT geometry ~p=318,t=6,kind="circle",radius=300~ END
+              319 BEGIN SPRINT geometry ~p=319,t=7,kind="cone",width=100,length=300,padding=25~ END
+              336 BEGIN SPRINT geometry ~p=336,t=6,kind="circle",radius=150~ END
+              337 BEGIN SPRINT geometry ~p=337,t=6,kind="circle",radius=200~ END
+              338 BEGIN SPRINT geometry ~p=338,t=6,kind="circle",radius=200~ END
+              343 BEGIN SPRINT geometry ~p=343,t=7,kind="cone",width=200,length=200,padding=25~ END
+              349 BEGIN SPRINT geometry ~p=349,t=6,kind="circle",radius=200~ END
+              351 BEGIN SPRINT geometry ~p=351,t=6,kind="circle",radius=125~ END
+              357 BEGIN SPRINT geometry ~p=357,t=6,kind="circle",radius=150~ END
+              360 BEGIN SPRINT geometry ~p=360,t=6,kind="circle",radius=300~ END
+              362 BEGIN SPRINT geometry ~p=362,t=6,kind="circle",radius=300~ END
+              366 BEGIN SPRINT geometry ~p=366,t=6,kind="circle",radius=300~ END
+              367 BEGIN SPRINT geometry ~p=367,t=6,kind="circle",radius=200~ END
+              368 BEGIN SPRINT geometry ~p=368,t=7,kind="cone",width=200,length=80,padding=25~ END
+              370 BEGIN SPRINT geometry ~p=370,t=11,kind="wall",wallMode="native"~ END
+              372 BEGIN SPRINT geometry ~p=372,t=6,kind="circle",radius=160~ END
+              373 BEGIN SPRINT geometry ~p=373,t=6,kind="circle",radius=200~ END
+              374 BEGIN SPRINT geometry ~p=374,t=7,kind="cone",width=120,length=300,padding=25~ END
+              377 BEGIN SPRINT geometry ~p=377,t=6,kind="circle",radius=200~ END
+              379 BEGIN SPRINT geometry ~p=379,t=7,kind="cone",width=300,length=300,padding=25~ END
+              381 BEGIN SPRINT geometry ~p=381,t=6,kind="circle",radius=200~ END
+              382 BEGIN SPRINT geometry ~p=382,t=7,kind="cone",width=120,length=300,padding=25~ END
+              383 BEGIN SPRINT geometry ~p=383,t=4,kind="line",length=10000~ END
+              384 BEGIN SPRINT geometry ~p=384,t=6,kind="circle",radius=65~ END
+              385 BEGIN SPRINT geometry ~p=385,t=6,kind="circle",radius=65~ END
+              386 BEGIN SPRINT geometry ~p=386,t=7,kind="cone",width=150,length=150,padding=25~ END
+              DEFAULT
+            END
+            PATCH_IF ~%SOURCE_RES%~ STRING_EQUAL_CASE ~USWI554~ AND projectile=304 BEGIN
+              SPRINT geometry ~p=304,t=11,kind="wall",wallMode="force"~
+            END
+            PATCH_IF ~%SOURCE_RES%~ STRING_EQUAL_CASE ~USWI867~ AND projectile=1 BEGIN
+              SPRINT geometry ~p=1,t=0,kind="wall",wallMode="prismatic"~
+            END
+            PATCH_IF ~%geometry%~ STRING_COMPARE ~~ != 0 BEGIN
+              // Tactics uses its own Animus Blizzard projectile mutator.
+              PATCH_IF ~%SOURCE_RES%~ STRING_EQUAL_CASE ~USES013~ AND projectile = 349 BEGIN
+                PATCH_IF MOD_IS_INSTALLED ~Tactics4IWD2EE/setup-Tactics4IWD2EE.tp2~ 3 BEGIN
+                  SPRINT geometry ~p=349,t=6,kind="circle",radius=256~
+                END
+              END
+              SPRINT entries ~%entries%[%i%]={%geometry%,target=%target%,wide=%wide%},~
+            END
+          END
+        END
+      END
+      PATCH_IF ~%entries%~ STRING_COMPARE ~~ != 0 BEGIN
+        INNER_ACTION BEGIN
+          APPEND ~I2SI_Data.lua~ ~I2SI_Spells["%SOURCE_RES%"]={headers={%entries%}}~
+        END
+      END
+    END
+  END
+BUT_ONLY

@@ -1,0 +1,11 @@
+# Local WeiDU installation output and development files
+**/backup/
+**/debug/
+*.DEBUG
+*.debug
+*.log
+*.bak
+*.tmp
+__pycache__/
+.DS_Store
+Thumbs.db

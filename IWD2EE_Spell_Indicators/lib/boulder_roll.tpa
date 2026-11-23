@@ -1,0 +1,24 @@
+// Component0: select a ground direction for the original Boulder Roll projectile.
+ACTION_IF FILE_EXISTS_IN_GAME ~USWI653.spl~ BEGIN
+ COPY_EXISTING ~USWI653.spl~ ~override~
+  READ_LONG 0x64 boulder_headers
+  READ_SHORT 0x68 boulder_count
+  FOR(i=0;i<boulder_count;++i)BEGIN
+   SET h=boulder_headers+i*40
+   READ_SHORT(h+38) boulder_projectile
+   PATCH_IF boulder_projectile!=383 BEGIN PATCH_FAIL ~Unexpected Boulder Roll projectile.~ END
+   WRITE_BYTE(h+12) 4 // Ground selection, like Lightning Bolt. Keep original range.
+  END
+  READ_LONG 0x50 boulder_desc_ref
+  GET_STRREF boulder_desc_ref boulder_desc
+  INNER_PATCH_SAVE boulder_desc ~%boulder_desc%~ BEGIN
+   REPLACE_TEXTUALLY EXACT_MATCH ~and always travels due south from the caster~ ~and travels in the direction chosen by the caster~
+  END
+  SAY 0x50 ~%boulder_desc%~
+ BUT_ONLY_IF_IT_CHANGES
+END
+
+COPY ~IWD2EE_Spell_Indicators/lua/boulder.lua~ ~override/I2SI_Boulder.lua~
+COPY ~IWD2EE_Spell_Indicators/lua/boulder_patch.lua~ ~override/I2SI_BoulderPatch.lua~
+APPEND ~IEex_IWD2_State.lua~ ~dofile("override/I2SI_Boulder.lua")~ UNLESS ~I2SI_Boulder.lua~
+APPEND ~IEex_Render_Patch.lua~ ~dofile("override/I2SI_BoulderPatch.lua")~ UNLESS ~I2SI_BoulderPatch.lua~

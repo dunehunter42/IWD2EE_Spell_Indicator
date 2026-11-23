@@ -1,0 +1,64 @@
+// Optional component1. Change UI target/range only; original effects and projectiles remain intact.
+COPY ~IWD2EE_Spell_Indicators/self_aoe/data.lua~ ~override/I2SI_SelfData.lua~
+ACTION_FOR_EACH i2si_self_res IN ~SPPR203~ ~SPPR309~ ~SPPR312~ ~SPPR313~ ~SPPR319~ ~SPPR406~ ~SPPR408~ ~SPPR414~ ~SPPR511~ ~SPPR516~ ~SPPR521~ ~SPPR610~ ~SPPR721~ ~SPPR722~ ~SPPR729~ ~SPPR801~ ~SPWI321~ ~SPWI519~ ~SPWI707~ ~SPWI906~ ~USPR659~ ~USPR853~ ~SPWI203~ ~SPWI910~ ~USPR653~ ~USWI954~ ~SPPR409~ ~SPWI227~ BEGIN
+ ACTION_IF FILE_EXISTS_IN_GAME ~%i2si_self_res%.spl~ BEGIN
+  COPY_EXISTING ~%i2si_self_res%.spl~ ~override~
+   READ_LONG 0x64 headers
+   READ_SHORT 0x68 count
+   READ_LONG 0x18 flags
+   READ_SHORT 0x1c spell_type
+   SET valid=(count>0 AND headers>=0x72 AND headers+count*40<=SOURCE_SIZE)
+   FOR(i=0;i<count;++i)BEGIN
+    READ_BYTE(headers+i*40+12) target
+    PATCH_IF target!=5 AND target!=7 BEGIN SET valid=0 END
+   END
+   PATCH_IF valid BEGIN
+    SPRINT entries ~~
+    FOR(i=0;i<count;++i)BEGIN
+     SET h=headers+i*40
+     READ_SHORT(h+38) projectile
+     SET radius=0
+     SET native_type=1
+     PATCH_MATCH projectile WITH
+      94 BEGIN SET radius=256 SET native_type=8 END
+      209 BEGIN SET radius=150 SET native_type=6 END
+      240 BEGIN SET radius=300 SET native_type=6 END
+      243 BEGIN SET radius=350 SET native_type=6 END
+      252 BEGIN SET radius=250 SET native_type=6 END
+      253 BEGIN SET radius=600 SET native_type=6 END
+      257 BEGIN SET radius=100 SET native_type=6 END
+      258 BEGIN SET radius=200 SET native_type=6 END
+      260 BEGIN SET radius=600 SET native_type=1 END
+      266 BEGIN SET radius=350 SET native_type=6 END
+      308 BEGIN SET radius=70 SET native_type=6 END
+      310 BEGIN SET radius=200 SET native_type=6 END
+      311 BEGIN SET radius=70 SET native_type=6 END
+      335 BEGIN SET radius=250 SET native_type=6 END
+      341 BEGIN SET radius=300 SET native_type=6 END
+      358 BEGIN SET radius=125 SET native_type=6 END
+      359 BEGIN SET radius=300 SET native_type=6 END
+      369 BEGIN SET radius=70 SET native_type=6 END
+      362 BEGIN SET radius=300 SET native_type=6 END
+      DEFAULT
+     END
+     SET fixed=0
+     PATCH_IF ~%SOURCE_RES%~ STRING_EQUAL_CASE ~SPWI203~ BEGIN SET radius=512 SET fixed=1 END
+     PATCH_IF ~%SOURCE_RES%~ STRING_EQUAL_CASE ~SPWI910~ BEGIN SET radius=175 SET fixed=1 END
+     PATCH_IF ~%SOURCE_RES%~ STRING_EQUAL_CASE ~USPR653~ BEGIN SET radius=200 SET fixed=1 END
+     PATCH_IF ~%SOURCE_RES%~ STRING_EQUAL_CASE ~USWI954~ BEGIN SET radius=200 SET fixed=1 END
+     PATCH_IF ~%SOURCE_RES%~ STRING_EQUAL_CASE ~SPPR409~ BEGIN SET radius=50 SET fixed=1 END
+     PATCH_IF radius<=0 BEGIN PATCH_FAIL ~Unsupported self-centred projectile for %SOURCE_RES%.~ END
+     SPRINT wide ~false~
+     PATCH_IF fixed=0 AND (spell_type=1 OR spell_type=2) AND (flags BAND 0x40000)=0 AND native_type>=6 AND native_type<=8 BEGIN SPRINT wide ~true~ END
+     SPRINT entries ~%entries%[%i%]={p=%projectile%,t=%native_type%,kind="circle",radius=%radius%,target=1,wide=%wide%,selfcenter=true},~
+     WRITE_BYTE(h+12) 1
+     WRITE_SHORT(h+14) 0
+    END
+    INNER_ACTION BEGIN
+     APPEND ~I2SI_SelfData.lua~ ~I2SI_SelfTargets["%SOURCE_RES%"]=true~
+     APPEND ~I2SI_SelfData.lua~ ~I2SI_SelfSpecs["%SOURCE_RES%"]={headers={%entries%}}~
+    END
+   END
+  BUT_ONLY_IF_IT_CHANGES
+ END
+END

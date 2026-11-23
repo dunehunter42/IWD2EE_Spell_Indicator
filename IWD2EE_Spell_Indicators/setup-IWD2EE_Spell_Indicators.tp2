@@ -1,0 +1,29 @@
+BACKUP ~IWD2EE_Spell_Indicators/backup~
+AUTHOR ~Local IWD2EE mod~
+VERSION ~1.3.1~
+README ~IWD2EE_Spell_Indicators/README.md~
+
+BEGIN ~IWD2EE Spell Indicators: spell area and trajectory previews~
+DESIGNATED 0
+REQUIRE_COMPONENT ~IWD2EE/IWD2EE.TP2~ ~1000~ ~IWD2EE Core is required.~
+REQUIRE_PREDICATE FILE_EXISTS_IN_GAME ~IEex_Render_Patch.lua~ ~IEex rendering support is required.~
+REQUIRE_PREDICATE NOT MOD_IS_INSTALLED ~I2T_AOE_Sample/setup-I2T_AOE_Sample.tp2~ 0 ~Uninstall I2T_AOE_Sample #0 before installing this mod. Both use the same render hook.~
+COPY ~IWD2EE_Spell_Indicators/lua/state.lua~ ~override/I2SI_State.lua~
+COPY ~IWD2EE_Spell_Indicators/lua/geometry.lua~ ~override/I2SI_Geometry.lua~
+COPY ~IWD2EE_Spell_Indicators/lua/patch.lua~ ~override/I2SI_Patch.lua~
+INCLUDE ~IWD2EE_Spell_Indicators/lib/boulder_roll.tpa~
+INCLUDE ~IWD2EE_Spell_Indicators/lib/build_manifest.tpa~
+APPEND ~IEex_IWD2_State.lua~ ~dofile("override/I2SI_State.lua")~ UNLESS ~I2SI_State.lua~
+APPEND ~IEex_Render_Patch.lua~ ~dofile("override/I2SI_Patch.lua")~ UNLESS ~I2SI_Patch.lua~
+
+BEGIN ~IWD2EE Spell Indicators: self-centred spell selection and previews~
+DESIGNATED 1
+REQUIRE_COMPONENT ~IWD2EE_Spell_Indicators/setup-IWD2EE_Spell_Indicators.tp2~ 0 ~Install Spell Indicators #0 first.~
+REQUIRE_PREDICATE NOT MOD_IS_INSTALLED ~I2SI_SelfAOE_Trial/setup-I2SI_SelfAOE_Trial.tp2~ 0 ~Uninstall the Prayer trial first.~
+INCLUDE ~IWD2EE_Spell_Indicators/self_aoe/install.tpa~
+INCLUDE ~IWD2EE_Spell_Indicators/self_aoe/bcs.tpa~
+COPY ~IWD2EE_Spell_Indicators/lua/state.lua~ ~override/I2SI_State.lua~
+COPY ~IWD2EE_Spell_Indicators/self_aoe/state.lua~ ~override/I2SI_SelfState.lua~
+COPY ~IWD2EE_Spell_Indicators/self_aoe/patch.lua~ ~override/I2SI_SelfPatch.lua~
+APPEND ~IEex_IWD2_State.lua~ ~dofile("override/I2SI_SelfState.lua")~ UNLESS ~I2SI_SelfState.lua~
+APPEND ~IEex_Render_Patch.lua~ ~dofile("override/I2SI_SelfPatch.lua")~ UNLESS ~I2SI_SelfPatch.lua~
