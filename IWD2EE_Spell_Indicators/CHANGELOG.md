@@ -1,5 +1,16 @@
 # Changes
 
+## 1.3.2 — Mass Spell (2026-11-26)
+
+- Preview the native Mass replacement area for eligible creature- and ground-targeted spells, including spells with no ordinary area preview.
+- Read pending Mass state each frame; cancel immediately without consuming charges or invoking native metamagic mutators.
+- Combine Mass with Widen and applicable equipment modifiers in native order.
+- Follow the hovered creature for Mass actor targets; preserve self-centred anchoring where applicable.
+- Fall back to header zero for missing/sentinel ability indices. Mass + Luck passed in-game testing; modifier combinations also passed offline native-function and regression checks.
+- Retain the actual native radius256 (Fireball200), despite the IWD2EE description saying20 feet. No actual range change is included.
+- Remove temporary Luck diagnostic logging from the published source.
+
+
 ## 2026-11-22 — Widen and Cancel Metamagic correction
 
 - Read pending Widen state on every frame and require a nonzero modifier special value, matching native EXMETAMA.
@@ -46,3 +57,5 @@
 - Consolidate current features, installation, optional components, modifier support and known limitations into the README.
 - Add an English repository landing page and preserve the Chinese package documentation.
 - Package only mod sources, documentation and the attributed WeiDU installer; exclude game assets, saves and development files.
+
+

@@ -51,7 +51,7 @@ local function render(area)
     local sy=IEex_ReadDword(actor+10)-cameraY+top
     if cfg.selfcenter then
         x,y=sx,sy
-    elseif cfg.target==2 then
+    elseif cfg.target==2 or (cfg.massPreview and cfg.target==1) then
         local picked=I2SI_Geometry.actor(game,IEex_ReadDword(area+0x246))
         if picked and IEex_ReadDword(picked+0x12)==area then
             x=IEex_ReadDword(picked+6)-cameraX+left
@@ -77,3 +77,4 @@ function I2SI_Render(area)
         print("IWD2EE Spell Indicators disabled after render error: "..tostring(err))
     end
 end
+

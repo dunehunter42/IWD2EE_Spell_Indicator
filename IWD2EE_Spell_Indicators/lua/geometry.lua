@@ -14,7 +14,9 @@ function G.actor(game,id)
 end
 
 function G.resolve(res,header,actor)
-    local original=I2SI_Spells[res]
+    local massHeaders=(I2SI_MassSpells or {})[res]
+    local massConfig=massHeaders and (massHeaders[header] or massHeaders[0])
+    local original=I2SI_Spells[res] or (massConfig and {headers=massHeaders})
     if not original then return nil end
     if original.headers then original=original.headers[header] or original.headers[0] end
     if not original then return nil end
@@ -22,6 +24,8 @@ function G.resolve(res,header,actor)
     local canonical=(ex_true_spell and ex_true_spell[res]) or res
     if canonical=="SPWI706" and c.kind=="cone" then c.width=c.width*2 end
     local areaSet,areaMult,rangeMult,widen=nil,100,100,false
+    local mass=false
+    local modifiers={}
     local source=c.target==4 and 1 or 0
     for _,offset in ipairs({0x5526,0x54FA}) do
         local node=IEex_ReadDword(actor+offset+4)
@@ -36,31 +40,42 @@ function G.resolve(res,header,actor)
                 -- Read it every frame; never use ex_metamagic_in_use (last cast).
                 if p2==251 and IEex_ReadLString(effect+0x30,8)=="EXWIDSPL"
                     and IEex_ReadDword(effect+0x48)~=0 then widen=true end
-                if p2==246 then
-                    local flags=IEex_ReadDword(effect+0x40)
-                    local condition=IEex_ReadWord(effect+0x48,0)
-                    local limit=IEex_ReadWord(effect+0x4A,0)
-                    if (bit.band(flags,0x10000)==0 or condition+1==c.p)
-                        and (bit.band(flags,0x20000)==0 or condition==c.t)
-                        and (bit.band(flags,0x40000)==0 or condition==source)
-                        and (bit.band(flags,0x80000)==0 or limit>0) then
-                        local value=IEex_ReadDword(effect+0x1C)
-                        if c.t>=6 and c.t<=8 then
-                            if bit.band(flags,0x1000000)~=0 then
-                                if bit.band(flags,0x100)~=0 then areaSet=value
-                                else areaMult=math.floor(areaMult*value/100) end
-                            elseif bit.band(flags,0x8000000)~=0 then rangeMult=math.floor(rangeMult*value/100) end
-                        end
-                    end
-                end
+                if p2==251 and IEex_ReadLString(effect+0x30,8)=="EXMASSPL"
+                    and IEex_ReadDword(effect+0x48)~=0 then mass=true end
+                if p2==246 then modifiers[#modifiers+1]=effect end
+                -- Apply projectile modifiers after pending Mass changes its type.
+
             end
             node=IEex_ReadDword(node)
         end
     end
+    if mass and massConfig and not (ex_source_spell and ex_source_spell[res]) then
+        -- EXMASSPL typeMutator returns missile index94 (native type8), radius256.
+        -- Do not call mutators here: previewing must never spend a charge.
+        c.massPreview=true;c.kind="circle";c.p=94;c.t=8;c.radius=256;c.wide=true
+        c.width=nil;c.length=nil;c.padding=nil;c.trigger=nil;c.wallMode=nil
+    end
+    for _,effect in ipairs(modifiers) do
+        local flags=IEex_ReadDword(effect+0x40)
+        local condition=IEex_ReadWord(effect+0x48,0)
+        local limit=IEex_ReadWord(effect+0x4A,0)
+        if (bit.band(flags,0x10000)==0 or condition+1==c.p)
+            and (bit.band(flags,0x20000)==0 or condition==c.t)
+            and (bit.band(flags,0x40000)==0 or condition==source)
+            and (bit.band(flags,0x80000)==0 or limit>0) then
+            local value=IEex_ReadDword(effect+0x1C)
+            if c.t>=6 and c.t<=8 then
+                if bit.band(flags,0x1000000)~=0 then
+                    if bit.band(flags,0x100)~=0 then areaSet=value
+                    else areaMult=math.floor(areaMult*value/100) end
+                elseif bit.band(flags,0x8000000)~=0 then rangeMult=math.floor(rangeMult*value/100) end
+            end
+        end
+    end
+    if c.kind=="mass-only" then return nil end
     local function area(value)
-        value=math.floor((areaSet or value)*areaMult/100)
         if widen and c.wide then value=math.floor(value*1.5) end
-        return value
+        return math.floor((areaSet or value)*areaMult/100)
     end
     if c.radius then c.radius=area(c.radius) end
     if c.width then c.width=area(c.width) end

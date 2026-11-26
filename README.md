@@ -2,7 +2,7 @@
 
 BG2-style spell area and trajectory previews for **Icewind Dale II with IWD2EE**. An independent WeiDU mod; Tactics is not required.
 
-**Version 1.3.1, including the 2026-11-22 Widen / Cancel Metamagic correction.**
+**Version 1.3.2 — Mass Spell previews and Luck selection correction.**
 
 [中文说明 / Chinese documentation](IWD2EE_Spell_Indicators/README.md) · [Changelog](IWD2EE_Spell_Indicators/CHANGELOG.md)
 
@@ -18,6 +18,10 @@ Circular and cone previews use a 75% vertical ground projection. Skull Trap and 
 Supported walls include Wall of Moonlight, Wall of Fire, Trial by Fire, Wall of Force and Prismatic Wall. Spiritual Wrath previews four directions from the caster.
 
 **Widen Spell and equipment:** previews read active modifiers every frame, including supported native modifiers such as Staff of Widening. Cancel Metamagic immediately removes the pending Widen preview while preserving equipment bonuses. Trap trigger radii remain separate. Previewing never consumes metamagic charges.
+
+**Mass Spell:** component #0 previews the replacement area while Mass Spell is active, including spells without a normal area preview. It follows the hovered creature or selected ground point, supports Widen and equipment modifiers, and restores the normal preview when metamagic is cancelled. Missing or sentinel ability indices fall back to header zero, including Luck (tested in game). Previews never consume charges.
+
+**Mass radius note:** the installed IWD2EE description says 20 feet, but its native Mass projectile uses radius 256 world units; Fireball uses 200. This mod previews that actual native radius, about 28% larger than Fireball, and does not change the spell's real area. Widen increases the native radius to 384 before applicable equipment modifiers.
 
 **Boulder Roll:** component #0 changes casting to ground-direction selection. The click sets the initial direction; the boulder continues toward the native terrain obstruction rather than stopping at the cursor. Its existing projectile effects are retained.
 
@@ -44,3 +48,4 @@ No Python, BG2 artwork or save editing is required. Bindings are generated from 
 ## Installer attribution
 
 The included Windows installer is unmodified **WeiDU 24900**, renamed for the mod. Its license and upstream source links are included in [THIRD_PARTY.md](IWD2EE_Spell_Indicators/THIRD_PARTY.md) and [WeiDU-COPYING.txt](IWD2EE_Spell_Indicators/WeiDU-COPYING.txt).
+
